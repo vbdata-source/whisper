@@ -32,7 +32,8 @@ RUN pip install --upgrade pip && \
         faster-whisper==1.1.1 \
         fastapi==0.115.0 \
         "uvicorn[standard]==0.30.6" \
-        python-multipart==0.0.12
+        python-multipart==0.0.12 \
+        requests==2.32.3
 
 # Modell-Preload: laedt large-v3 in int8 ins HuggingFace-Cache des Builders.
 # Wird dann in der finalen Stage uebernommen -> kein Runtime-Download noetig.
