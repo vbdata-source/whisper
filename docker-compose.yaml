@@ -22,8 +22,8 @@ services:
       COOLIFY_RESOURCE_UUID: ${COOLIFY_RESOURCE_UUID}
       COOLIFY_CONTAINER_NAME: whisper-${COOLIFY_RESOURCE_UUID}
     
-    ports:
-      - "8000:8000"
+    # Port-Mapping entfernt - Zugriff nur via Traefik (HTTPS)
+    # Intern erreichbar: http://whisper:8000
     
     volumes:
       # Model Cache (verhindert Re-Download bei Redeploy)
@@ -47,12 +47,13 @@ services:
       - coolify.type=service
       - coolify.name=whisper-${COOLIFY_RESOURCE_UUID}
       
-      # Optional: Traefik (falls du es extern brauchen solltest)
-      # - traefik.enable=true
-      # - traefik.http.routers.whisper.rule=Host(`whisper.vbdata-cloud.at`)
-      # - traefik.http.routers.whisper.entrypoints=https
-      # - traefik.http.routers.whisper.tls=true
-      # - traefik.http.routers.whisper.tls.certresolver=letsencrypt
+      # Traefik HTTPS Routing
+      - traefik.enable=true
+      - traefik.http.routers.whisper.rule=Host(`whisper.vbdata-cloud.at`)
+      - traefik.http.routers.whisper.entrypoints=https
+      - traefik.http.routers.whisper.tls=true
+      - traefik.http.routers.whisper.tls.certresolver=letsencrypt
+      - traefik.http.services.whisper.loadbalancer.server.port=8000
     
     # CPU/Memory Limits (optional, anpassen nach Bedarf)
     deploy:
