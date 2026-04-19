@@ -39,7 +39,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
+      start_period: 180s
     
     labels:
       # Coolify Management
@@ -60,9 +60,9 @@ services:
       resources:
         limits:
           cpus: '4.0'
-          memory: 8G
+          memory: 12G
         reservations:
-          memory: 4G
+          memory: 6G
 
 volumes:
   whisper-models:
