@@ -29,7 +29,7 @@ WORKDIR /app
 # Python-Dependencies. faster-whisper bringt CTranslate2 + HF-Hub mit.
 RUN pip install --upgrade pip && \
     pip install \
-        faster-whisper==1.0.3 \
+        faster-whisper==1.1.1 \
         fastapi==0.115.0 \
         "uvicorn[standard]==0.30.6" \
         python-multipart==0.0.12
