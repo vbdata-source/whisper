@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  whisper:
+    build:
+      context: https://github.com/vbdata-source/whisper.git#main
+      dockerfile: Dockerfile
+      args:
+        MODEL_NAME: large-v3
+    image: vbdata-whisper:latest
+    container_name: whisper-${COOLIFY_RESOURCE_UUID:-local}
+    restart: unless-stopped
+    
+    environment:
+      # Whisper Config
+      WHISPER_MODEL: large-v3
+      WHISPER_LANGUAGE: de
+      # Server Config
+      PORT: 8000
+      HOST: 0.0.0.0
+      # Coolify Metadata
+      COOLIFY_RESOURCE_UUID: ${COOLIFY_RESOURCE_UUID}
+      COOLIFY_CONTAINER_NAME: whisper-${COOLIFY_RESOURCE_UUID}
+    
+    ports:
+      - "8000:8000"
+    
+    volumes:
+      # Model Cache (verhindert Re-Download bei Redeploy)
+      - whisper-models:/root/.cache/whisper
+      # Optional: Audio-Files Workspace
+      - whisper-data:/data
+    
+    networks:
+      - coolify
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    
+    labels:
+      # Coolify Management
+      - coolify.managed=true
+      - coolify.type=service
+      - coolify.name=whisper-${COOLIFY_RESOURCE_UUID}
+      
+      # Optional: Traefik (falls du es extern brauchen solltest)
+      # - traefik.enable=true
+      # - traefik.http.routers.whisper.rule=Host(`whisper.vbdata-cloud.at`)
+      # - traefik.http.routers.whisper.entrypoints=https
+      # - traefik.http.routers.whisper.tls=true
+      # - traefik.http.routers.whisper.tls.certresolver=letsencrypt
+    
+    # CPU/Memory Limits (optional, anpassen nach Bedarf)
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 8G
+        reservations:
+          memory: 4G
+
+volumes:
+  whisper-models:
+    name: ${COOLIFY_RESOURCE_UUID:-local}_whisper-models
+  whisper-data:
+    name: ${COOLIFY_RESOURCE_UUID:-local}_whisper-data
+
+networks:
+  coolify:
+    external: true
+    name: coolify
